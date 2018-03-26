@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    name: hubimage
+  name: hubimage
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    name: hubimage
+  template:
+    metadata:
+      labels:
+        name: hubimage
+    spec:
+      containers:
+      - name: hubimage
+        image: harbor.huayun.com/library/hubimage:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9096
+          protocol: TCP
+        args:
+          - --harborhost=x.x.x.x
+          - --username=test
+          - --password=Passw0rd
+          - --dockertcpport=2375
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    name: hubimage
+  name: hubimage
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+  - port: 90
+    protocol: TCP
+    nodePort: 30909
+    targetPort: 9096
+  selector:
+    name: hubimage
+---
